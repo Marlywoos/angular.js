@@ -298,6 +298,18 @@ describe('filters', function() {
 
       expect(date(earlyDate, "MMMM dd, y")).
                       toEqual('September 03, 1');
+
+      expect(date(noon, "MMMM dd, y G")).
+                      toEqual('September 03, 2010 AD');
+
+      expect(date(noon, "MMMM dd, y GG")).
+                      toEqual('September 03, 2010 AD');
+
+      expect(date(noon, "MMMM dd, y GGG")).
+                      toEqual('September 03, 2010 AD');
+
+      expect(date(noon, "MMMM dd, y GGGG")).
+                      toEqual('September 03, 2010 Anno Domini');
     });
 
     it('should accept negative numbers as strings', function() {
@@ -456,6 +468,16 @@ describe('filters', function() {
     it('should use UTC if the timezone is set to "UTC"', function() {
       expect(date(new Date(2003, 8, 10, 3, 2, 4), 'yyyy-MM-dd HH-mm-ss')).toEqual('2003-09-10 03-02-04');
       expect(date(new Date(Date.UTC(2003, 8, 10, 3, 2, 4)), 'yyyy-MM-dd HH-mm-ss', 'UTC')).toEqual('2003-09-10 03-02-04');
+      expect(date(new Date(Date.UTC(2003, 8, 10, 3, 2, 4)), 'yyyy-MM-dd HH-mm-ssZ', 'UTC')).toEqual('2003-09-10 03-02-04+0000');
+    });
+
+    it('should support conversion to any timezone', function() {
+      expect(date(new Date(Date.UTC(2003, 8, 10, 3, 2, 4)), 'yyyy-MM-dd HH-mm-ssZ', 'GMT+0500')).toEqual('2003-09-10 08-02-04+0500');
+    });
+
+    it('should fallback to default timezone in case an unknown timezone was passed', function() {
+      var value = new Date(2003, 8, 10, 3, 2, 4);
+      expect(date(value, 'yyyy-MM-dd HH-mm-ssZ', 'WTF')).toEqual(date(value, 'yyyy-MM-dd HH-mm-ssZ'));
     });
   });
 });

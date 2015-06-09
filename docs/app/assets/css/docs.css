@@ -415,7 +415,7 @@ iframe.example {
 
 .main-body-grid .side-navigation {
   position:relative;
-  padding-bottom:50px;
+  padding-bottom:120px;
 }
 
 .main-body-grid .side-navigation.ng-hide {
@@ -583,6 +583,12 @@ ul.events > li {
   margin-bottom:40px;
 }
 
+.definition-table td {
+  padding: 8px;
+  border: 1px solid #eee;
+  vertical-align: top;
+}
+
 @media only screen and (min-width: 769px) and (max-width: 991px) {
   .main-body-grid {
     margin-top: 160px;
@@ -631,6 +637,7 @@ ul.events > li {
   }
   .main-body-grid .side-navigation {
     display:block!important;
+    padding-bottom:50px;
   }
   .main-body-grid .side-navigation.ng-hide {
     display:none!important;
@@ -693,4 +700,8 @@ ul.events > li {
   #wrapper {
     padding-bottom:0px;
   }
+}
+
+iframe[name="example-anchoringExample"] {
+  height:400px;
 }

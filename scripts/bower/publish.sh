@@ -14,21 +14,6 @@ function init {
   TMP_DIR=$(resolveDir ../../tmp)
   BUILD_DIR=$(resolveDir ../../build)
   NEW_VERSION=$(cat $BUILD_DIR/version.txt)
-  REPOS=(
-    angular
-    angular-animate
-    angular-aria
-    angular-cookies
-    angular-i18n
-    angular-loader
-    angular-mocks
-    angular-route
-    angular-resource
-    angular-sanitize
-    angular-scenario
-    angular-touch
-    angular-messages
-  )
 }
 
 
@@ -61,6 +46,21 @@ function prepare {
 
   # move csp.css
   cp $BUILD_DIR/angular-csp.css $TMP_DIR/bower-angular
+
+
+  #
+  # Run local precommit script if there is one
+  #
+  for repo in "${REPOS[@]}"
+  do
+    if [ -f $TMP_DIR/bower-$repo/precommit.sh ]
+      then
+        echo "-- Running precommit.sh script for bower-$repo"
+        cd $TMP_DIR/bower-$repo
+        $TMP_DIR/bower-$repo/precommit.sh
+        cd $SCRIPT_DIR
+    fi
+  done
 
 
   #
@@ -114,4 +114,5 @@ function publish {
   done
 }
 
+source $(dirname $0)/repos.inc
 source $(dirname $0)/../utils.inc

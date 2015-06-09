@@ -787,6 +787,39 @@ describe('ngMock', function() {
             expect(testFn.$$hashKey).toBeUndefined();
           });
         });
+
+        describe('$inject cleanup', function() {
+          function testFn() {
+
+          }
+
+          it('should add $inject when invoking test function', inject(function($injector) {
+            $injector.invoke(testFn);
+            expect(testFn.$inject).toBeDefined();
+          }));
+
+          it('should cleanup $inject after previous test', function() {
+            expect(testFn.$inject).toBeUndefined();
+          });
+
+          it('should add $inject when annotating test function', inject(function($injector) {
+            $injector.annotate(testFn);
+            expect(testFn.$inject).toBeDefined();
+          }));
+
+          it('should cleanup $inject after previous test', function() {
+            expect(testFn.$inject).toBeUndefined();
+          });
+
+          it('should invoke an already annotated function', inject(function($injector) {
+            testFn.$inject = [];
+            $injector.invoke(testFn);
+          }));
+
+          it('should not cleanup $inject after previous test', function() {
+            expect(testFn.$inject).toBeDefined();
+          });
+        });
       });
 
       describe('in DSL', function() {
@@ -1193,7 +1226,7 @@ describe('ngMock', function() {
       });
 
 
-      it ('should throw exception when only headers differs from expectation', function() {
+      it('should throw exception when only headers differs from expectation', function() {
         hb.when('GET').respond(200, '', {});
         hb.expect('GET', '/match', undefined, {'Content-Type': 'application/json'});
 
@@ -1204,7 +1237,7 @@ describe('ngMock', function() {
       });
 
 
-      it ('should throw exception when only data differs from expectation', function() {
+      it('should throw exception when only data differs from expectation', function() {
         hb.when('GET').respond(200, '', {});
         hb.expect('GET', '/match', 'some-data');
 
@@ -1215,7 +1248,7 @@ describe('ngMock', function() {
       });
 
 
-      it ('should not throw an exception when parsed body is equal to expected body object', function() {
+      it('should not throw an exception when parsed body is equal to expected body object', function() {
         hb.when('GET').respond(200, '', {});
 
         hb.expect('GET', '/match', {a: 1, b: 2});
@@ -1230,7 +1263,7 @@ describe('ngMock', function() {
       });
 
 
-      it ('should throw exception when only parsed body differs from expected body object', function() {
+      it('should throw exception when only parsed body differs from expected body object', function() {
         hb.when('GET').respond(200, '', {});
         hb.expect('GET', '/match', {a: 1, b: 2});
 
@@ -1718,6 +1751,28 @@ describe('ngMock', function() {
       }));
     });
   });
+
+
+  describe('$controllerDecorator', function() {
+    it('should support creating controller with bindings', function() {
+      var called = false;
+      var data = [
+        { name: 'derp1', id: 0 },
+        { name: 'testname', id: 1 },
+        { name: 'flurp', id: 2 }
+      ];
+      module(function($controllerProvider) {
+        $controllerProvider.register('testCtrl', function() {
+          called = true;
+          expect(this.data).toBe(data);
+        });
+      });
+      inject(function($controller, $rootScope) {
+        $controller('testCtrl', { scope: $rootScope }, { data: data });
+        expect(called).toBe(true);
+      });
+    });
+  });
 });
 
 
@@ -1779,4 +1834,11 @@ describe('ngMockE2E', function() {
       }));
     });
   });
+});
+
+describe('make sure that we can create an injector outside of tests', function() {
+  //since some libraries create custom injectors outside of tests,
+  //we want to make sure that this is not breaking the internals of
+  //how we manage annotated function cleanup during tests. See #10967
+  angular.injector([function($injector) {}]);
 });

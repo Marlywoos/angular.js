@@ -99,7 +99,6 @@ describe('$location', function() {
 
         /* global Browser: false */
         var b = new Browser($window, $document, fakeLog, sniffer);
-        b.pollFns = [];
         return b;
       };
     });
@@ -670,6 +669,16 @@ describe('$location', function() {
       var $browserUrl = spyOnlyCallsWithArgs($browser, 'url').andCallThrough();
       $rootScope.$digest();
       expect($browserUrl).not.toHaveBeenCalled();
+    }));
+  });
+
+  describe('rewrite hashbang url <> html5 url', function() {
+    beforeEach(initService({html5Mode: true, supportHistory: true}));
+    beforeEach(inject(initBrowser({url:'http://new.com/#', basePath: '/'})));
+
+    it('should not replace browser url if only the empty hash fragment is cleared', inject(function($browser, $location) {
+      expect($browser.url()).toBe('http://new.com/#');
+      expect($location.absUrl()).toBe('http://new.com/');
     }));
   });
 
@@ -1323,7 +1332,7 @@ describe('$location', function() {
     });
 
 
-    it ('should not rewrite links when rewriting links is disabled', function() {
+    it('should not rewrite links when rewriting links is disabled', function() {
       configureService({linkHref: 'link?a#b', html5Mode: {enabled: true, rewriteLinks:false}, supportHist: true});
       inject(
         initBrowser(),
@@ -1860,7 +1869,7 @@ describe('$location', function() {
       })
     );
 
-    it ('should fire $locationChangeSuccess event when change from browser location bar',
+    it('should fire $locationChangeSuccess event when change from browser location bar',
       inject(function($log, $location, $browser, $rootScope) {
         $rootScope.$apply(); // clear initial $locationChangeStart
 

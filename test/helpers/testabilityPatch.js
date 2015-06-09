@@ -37,6 +37,17 @@ beforeEach(function() {
 afterEach(function() {
   var count, cache;
 
+  // both of these nodes are persisted across tests
+  // and therefore the hashCode may be cached
+  var node = document.querySelector('html');
+  if (node) {
+    node.$$hashKey = null;
+  }
+  var bod = document.body;
+  if (bod) {
+    bod.$$hashKey = null;
+  }
+
   if (this.$injector) {
     var $rootScope = this.$injector.get('$rootScope');
     var $rootElement = this.$injector.get('$rootElement');
@@ -160,8 +171,9 @@ function sortedHtml(element, showNgClass) {
         attrs.push(' class="' + className + '"');
       }
       for (var i = 0; i < attributes.length; i++) {
-        if (i > 0 && attributes[i] == attributes[i - 1])
+        if (i > 0 && attributes[i] == attributes[i - 1]) {
           continue; //IE9 creates dupes. Ignore them!
+        }
 
         var attr = attributes[i];
         if (attr.name.match(/^ng[\:\-]/) ||
@@ -221,8 +233,9 @@ function sortedHtml(element, showNgClass) {
         var tmp = style;
         style = [];
         forEach(tmp, function(value) {
-          if (!value.match(/^max[^\-]/))
+          if (!value.match(/^max[^\-]/)) {
             style.push(value);
+          }
         });
         if (style.length) {
           html += ' style="' + style.join('; ') + ';"';
